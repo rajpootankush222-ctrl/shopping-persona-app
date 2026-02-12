@@ -1,4 +1,5 @@
 // pages/api/generate-persona.js
+// 100% FREE VERSION - No paid APIs needed!
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,8 +9,11 @@ export default async function handler(req, res) {
   const { answers, photo } = req.body;
 
   try {
-    const personaData = await getPersonaFromClaude(answers);
-    const avatarUrl = await generateAvatar(photo, personaData);
+    // Generate persona using local logic (no Claude API)
+    const personaData = generatePersonaLocally(answers);
+    
+    // Use the user's photo directly (no AI generation)
+    const avatarUrl = photo; // Just use their uploaded photo
     
     return res.status(200).json({
       personaTitle: personaData.title,
@@ -23,158 +27,153 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({ error: 'Failed to generate persona', details: error.message });
+    return res.status(500).json({ error: 'Failed to generate persona' });
   }
 }
 
-async function getPersonaFromClaude(answers) {
-  const prompt = `You are a fun shopping persona generator. Based on these answers, assign a hilarious shopping persona.
+function generatePersonaLocally(answers) {
+  const { cartBehavior, paymentStyle, shoppingSpeed } = answers;
+  
+  // Persona mapping logic
+  const personas = {
+    // Cart Ghosts
+    'ghost-prepaid-lightning': {
+      title: '⚡ Lightning Cart Ghost 👻',
+      traits: [
+        '🛒 Ghosts carts faster than light',
+        '💳 Only pays when feeling generous',
+        '⚡ In and out like a ninja'
+      ],
+      tagline: 'If it takes longer than 5 mins, it\'s abandoned',
+      cardColor: { start: '#667eea', end: '#764ba2' }
+    },
+    'ghost-cod-planner': {
+      title: '📋 Calculated Cart Ghost 👻',
+      traits: [
+        '🛒 Plans to ghost the cart the night before',
+        '💳 Cash on Delivery for peace of mind',
+        '⚡ Slow and steady abandonment'
+      ],
+      tagline: 'I ghost with intention, not impulse',
+      cardColor: { start: '#f093fb', end: '#f5576c' }
+    },
+    'ghost-bnpl-zen': {
+      title: '🧘 Zen Cart Ghost 👻',
+      traits: [
+        '🛒 Takes time to ghost the perfect cart',
+        '💳 Buy Now, Ghost Later philosophy',
+        '⚡ Mindful abandonment is an art'
+      ],
+      tagline: 'Ghosting carts is my meditation',
+      cardColor: { start: '#4facfe', end: '#00f2fe' }
+    },
 
-Answers:
-- Cart behavior: ${answers.cartBehavior}
-- Payment style: ${answers.paymentStyle}  
-- Shopping speed: ${answers.shoppingSpeed}
+    // Decisive Shoppers
+    'decisive-prepaid-lightning': {
+      title: '🚀 Rocket Checkout Champion ⚡',
+      traits: [
+        '🛒 Cart to checkout in 3 seconds flat',
+        '💳 Prepaid discount hunter supreme',
+        '⚡ Speed shopping is my superpower'
+      ],
+      tagline: 'I see it, I buy it, I own it',
+      cardColor: { start: '#fa709a', end: '#fee140' }
+    },
+    'decisive-cod-planner': {
+      title: '📊 Strategic Instant Buyer 💼',
+      traits: [
+        '🛒 Plans purchases, executes instantly',
+        '💳 COD for maximum control',
+        '⚡ Calculated but decisive'
+      ],
+      tagline: 'Plan fast, buy faster',
+      cardColor: { start: '#30cfd0', end: '#330867' }
+    },
+    'decisive-bnpl-zen': {
+      title: '😎 Chill YOLO Spender 🎯',
+      traits: [
+        '🛒 Decisive when the vibe is right',
+        '💳 BNPL because why stress?',
+        '⚡ Relaxed but committed'
+      ],
+      tagline: 'I decide now, pay whenever',
+      cardColor: { start: '#a8edea', end: '#fed6e3' }
+    },
 
-Generate a JSON response with:
-{
-  "title": "A funny persona title (e.g., 'Certified Cart Ghost 👻', 'Last-Minute Glam Goddess ✨')",
-  "traits": [
-    "🛒 Trait about their shopping style",
-    "💳 Trait about their payment behavior",
-    "⚡ Trait about their speed/planning"
-  ],
-  "tagline": "A funny one-liner tagline (max 60 chars)",
-  "cardColor": {
-    "start": "#667eea",
-    "end": "#764ba2"
-  },
-  "avatarStyle": "Detailed description for image generation"
+    // Collectors/Curators
+    'collector-prepaid-lightning': {
+      title: '🎨 Flash Art Curator ⚡',
+      traits: [
+        '🛒 Curates carts like museum exhibits',
+        '💳 Hunts discounts like treasure',
+        '⚡ Quick eye for the perfect piece'
+      ],
+      tagline: 'My cart is a masterpiece in 5 minutes',
+      cardColor: { start: '#ff9a9e', end: '#fecfef' }
+    },
+    'collector-cod-planner': {
+      title: '🗂️ Wishlist Architect 📋',
+      traits: [
+        '🛒 Each item carefully selected',
+        '💳 Cash on Delivery, no risks',
+        '⚡ Patience is part of the process'
+      ],
+      tagline: 'Rome wasn\'t built in a day, neither is my cart',
+      cardColor: { start: '#ffecd2', end: '#fcb69f' }
+    },
+    'collector-bnpl-zen': {
+      title: '☕ Slow Glow Collector 🌸',
+      traits: [
+        '🛒 Curating is a journey, not a race',
+        '💳 BNPL for flexible collecting',
+        '⚡ Time is just a construct'
+      ],
+      tagline: 'Good things come to those who browse',
+      cardColor: { start: '#ffeaa7', end: '#fdcb6e' }
+    }
+  };
+
+  // Create persona key
+  const personaKey = `${cartBehavior}-${paymentStyle}-${shoppingSpeed}`;
+  
+  // Get persona or fallback to default
+  const persona = personas[personaKey] || {
+    title: '🎭 Unique Shopping Unicorn 🦄',
+    traits: [
+      '🛒 ' + getCartTrait(cartBehavior),
+      '💳 ' + getPaymentTrait(paymentStyle),
+      '⚡ ' + getSpeedTrait(shoppingSpeed)
+    ],
+    tagline: 'One of a kind shopper extraordinaire!',
+    cardColor: { start: '#667eea', end: '#764ba2' }
+  };
+
+  return persona;
 }
 
-Make it super fun and relatable! Use emojis. The cardColor should match the persona vibe.
-
-For avatarStyle, describe a Disney/Pixar-style 3D character portrait based on the persona. Include mood, props, color scheme, and personality. Example: "Confident character surrounded by shopping bags, mischievous grin, purple-blue gradient background, holding a glowing phone, playful energy"
-
-Return ONLY the JSON, no other text.`;
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929',
-        max_tokens: 1024,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Claude API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    
-    // Check if response has content
-    if (!data.content || !Array.isArray(data.content) || data.content.length === 0) {
-      throw new Error('Invalid response from Claude API: no content');
-    }
-    
-    const content = data.content[0].text;
-    
-    // Extract JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in Claude response');
-    }
-    
-    return JSON.parse(jsonMatch[0]);
-  } catch (error) {
-    console.error('Claude API Error:', error);
-    throw error;
-  }
+function getCartTrait(behavior) {
+  const traits = {
+    ghost: 'Professional cart abandoner',
+    decisive: 'Instant decision maker',
+    collector: 'Wishlist curator supreme'
+  };
+  return traits[behavior] || 'Mystery shopper';
 }
 
-async function generateAvatar(photoBase64, personaData) {
-  const imagePrompt = `3D animated character portrait, modern Pixar-Disney animation style, professional quality render, vibrant colors, studio lighting, shallow depth of field, highly detailed.
+function getPaymentTrait(style) {
+  const traits = {
+    prepaid: 'Discount hunter extraordinaire',
+    cod: 'Cash is king believer',
+    bnpl: 'Future-focused spender'
+  };
+  return traits[style] || 'Payment philosopher';
+}
 
-Character description: ${personaData.avatarStyle}
-
-Style: Stylized 3D character art with exaggerated features, expressive face, warm lighting, gradient background, cinematic composition. High resolution, centered portrait, no text or logos.`;
-
-  try {
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        version: "5599ed30703defd1d160a25a63321b4dec97101d98b4674bcc56e41f62f35637",
-        input: {
-          prompt: imagePrompt,
-          num_inference_steps: 4,
-          guidance_scale: 3.5,
-          width: 768,
-          height: 768,
-          num_outputs: 1
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Replicate API error: ${response.status} - ${errorText}`);
-    }
-
-    let prediction = await response.json();
-    
-    // Poll for completion (max 60 seconds)
-    let attempts = 0;
-    const maxAttempts = 60;
-    
-    while (prediction.status !== 'succeeded' && prediction.status !== 'failed' && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      attempts++;
-      
-      const statusResponse = await fetch(
-        `https://api.replicate.com/v1/predictions/${prediction.id}`,
-        {
-          headers: {
-            'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`
-          }
-        }
-      );
-      
-      if (!statusResponse.ok) {
-        throw new Error('Failed to check prediction status');
-      }
-      
-      prediction = await statusResponse.json();
-    }
-
-    if (prediction.status === 'failed') {
-      throw new Error('Image generation failed');
-    }
-    
-    if (attempts >= maxAttempts) {
-      throw new Error('Image generation timeout');
-    }
-
-    if (!prediction.output || !Array.isArray(prediction.output) || prediction.output.length === 0) {
-      throw new Error('No image URL in prediction output');
-    }
-
-    return prediction.output[0];
-  } catch (error) {
-    console.error('Replicate API Error:', error);
-    throw error;
-  }
+function getSpeedTrait(speed) {
+  const traits = {
+    lightning: 'Lightning speed champion',
+    planner: 'Strategic planning master',
+    zen: 'Zen shopping guru'
+  };
+  return traits[speed] || 'Time traveler';
 }
