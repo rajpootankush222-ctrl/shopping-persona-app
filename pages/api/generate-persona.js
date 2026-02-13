@@ -1,5 +1,7 @@
 // pages/api/generate-persona.js
-// FIXED VERSION - Properly generates and returns AI superhero avatars
+// TWO-STEP PROCESS: 
+// 1. GPT-4 Vision analyzes user photo
+// 2. DALL-E generates Pixar superhero based on analyzed features
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -9,14 +11,18 @@ export default async function handler(req, res) {
   const { answers, photo } = req.body;
 
   try {
-    // Generate persona using local logic
+    // Step 1: Generate persona based on answers
     const personaData = generatePersonaLocally(answers);
     
-    // CRITICAL: Actually generate the avatar image with DALL-E
-    const avatarUrl = await generateSuperheroAvatar(personaData, photo);
+    // Step 2: Use GPT-4 Vision to analyze the user's photo
+    console.log('Step 1: Analyzing user photo with GPT-4 Vision...');
+    const facialAnalysis = await analyzePhotoWithGPT4Vision(photo);
+    console.log('Facial analysis:', facialAnalysis);
     
-    // Log for debugging
-    console.log('Generated avatar URL:', avatarUrl);
+    // Step 3: Generate Pixar superhero with analyzed facial features
+    console.log('Step 2: Generating Pixar superhero avatar...');
+    const avatarUrl = await generatePixarSuperheroFromAnalysis(personaData, facialAnalysis);
+    console.log('Avatar generated:', avatarUrl);
     
     return res.status(200).json({
       personaTitle: personaData.title,
@@ -52,7 +58,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'If it takes longer than 5 mins, it\'s abandoned',
       cardColor: { start: '#667eea', end: '#764ba2' },
-      superheroStyle: 'A confident woman in a sleek purple and electric blue superhero suit with a lightning bolt emblem on the chest, wearing a stylish purple domino mask, flowing translucent cape, surrounded by purple energy aura with shopping bags vanishing into sparkles, dynamic superhero pose with one hand raised creating lightning effects, purple and blue gradient background with lightning bolts'
+      costume: 'sleek purple and electric blue superhero suit with lightning bolt emblem on chest, flowing translucent cape, stylish purple domino mask with lightning accents',
+      powers: 'purple energy aura, shopping bags vanishing into sparkles, lightning effects crackling around hands',
+      background: 'purple and blue gradient with lightning bolts and phantom shopping bag silhouettes'
     },
     'ghost-cod-planner': {
       title: '📋 Calculated Cart Ghost 👻',
@@ -64,7 +72,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I ghost with intention, not impulse',
       cardColor: { start: '#f093fb', end: '#f5576c' },
-      superheroStyle: 'A thoughtful woman in a sophisticated pink and purple tactical superhero suit with organized utility pouches and belt, wearing an intelligent-looking pink mask with HUD display, smart shoulder cape, surrounded by holographic shopping lists and plans, confident superhero stance reviewing holographic battle plans, pink gradient background with geometric patterns'
+      costume: 'sophisticated pink and purple tactical superhero suit with utility pouches, smart shoulder cape, intelligent-looking pink mask with HUD display',
+      powers: 'holographic shopping lists and strategic plans floating around, clipboard shield',
+      background: 'pink gradient with geometric patterns and data visualizations'
     },
     'ghost-bnpl-zen': {
       title: '🧘 Zen Cart Ghost 👻',
@@ -76,7 +86,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Ghosting carts is my meditation',
       cardColor: { start: '#4facfe', end: '#00f2fe' },
-      superheroStyle: 'A serene woman in a flowing light blue and cyan martial arts inspired superhero suit with zen circle emblem, wearing a peaceful blue mask with third eye symbol, meditation-style wrapped sash, floating in meditation pose with chi energy swirls and shopping items orbiting peacefully, tranquil blue gradient background with floating clouds and zen circles'
+      costume: 'flowing light blue and cyan martial arts inspired superhero suit with zen circle emblem, meditation-style wrapped sash, peaceful blue mask with third eye symbol',
+      powers: 'chi energy swirls, shopping items orbiting peacefully, zen aura',
+      background: 'tranquil blue gradient with floating clouds and zen circles'
     },
     'decisive-prepaid-lightning': {
       title: '🚀 Rocket Checkout Champion ⚡',
@@ -88,7 +100,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I see it, I buy it, I own it',
       cardColor: { start: '#fa709a', end: '#fee140' },
-      superheroStyle: 'A powerful woman in vibrant pink and yellow armored superhero suit with star emblem, rocket boosters on boots, championship belt, wearing an aerodynamic pink mask, speed force lightning crackling around body, shopping bags transformed into victory trophies, explosive superhero landing pose with fist to ground creating shockwave, dynamic pink-yellow gradient background with speed lines and comic-style action effects'
+      costume: 'vibrant pink and yellow armored superhero suit with star emblem and rocket boosters on boots, aerodynamic pink mask with speed lines, championship belt',
+      powers: 'speed force lightning crackling around body, shopping bags as victory trophies',
+      background: 'dynamic pink-yellow gradient with speed lines and comic-style POW effects'
     },
     'decisive-cod-planner': {
       title: '📊 Strategic Instant Buyer 💼',
@@ -100,7 +114,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Plan fast, buy faster',
       cardColor: { start: '#30cfd0', end: '#330867' },
-      superheroStyle: 'A professional woman in high-tech teal and purple tactical armor with digital display panels and commander insignia, wearing an advanced teal visor mask with targeting system, tech-enhanced gloves, surrounded by holographic tactical displays and data streams flowing from fingertips, commanding superhero stance directing holographic battle plans, sleek teal-purple gradient background with digital grid'
+      costume: 'high-tech teal and purple tactical armor with digital display panels and commander insignia, advanced teal visor mask with targeting system, tech-enhanced gloves',
+      powers: 'holographic tactical displays surrounding character, data streams flowing from fingertips',
+      background: 'sleek teal-purple gradient with digital grid and command center holograms'
     },
     'decisive-bnpl-zen': {
       title: '😎 Chill YOLO Spender 🎯',
@@ -112,7 +128,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I decide now, pay whenever',
       cardColor: { start: '#a8edea', end: '#fed6e3' },
-      superheroStyle: 'A cool woman in a stylish pastel blue and pink casual-cool superhero suit with trendy jacket overlay, wearing fashionable mirror sunglasses as superhero mask, chill aura emanating confidence, credit cards floating like playing cards, effortlessly cool superhero lean with arms crossed, soft pastel gradient background with dreamy bokeh effects'
+      costume: 'stylish pastel blue and pink casual-cool superhero suit with trendy jacket overlay, fashionable mirror sunglasses as superhero mask',
+      powers: 'chill confidence aura, credit cards floating like playing cards being shuffled',
+      background: 'soft pastel gradient with dreamy bokeh effects and YOLO energy wisps'
     },
     'collector-prepaid-lightning': {
       title: '🎨 Flash Art Curator ⚡',
@@ -124,7 +142,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'My cart is a masterpiece in 5 minutes',
       cardColor: { start: '#ff9a9e', end: '#fecfef' },
-      superheroStyle: 'An artistic woman in a pink superhero suit with paint-splash patterns, elegant cape that looks like flowing paint, artist palette shield, wearing a creative pink mask with artistic swirl designs and artist beret, shopping items floating on display pedestals with magical curator light beams, artistic superhero pose presenting curated collection, vibrant pink gradient background with paint splashes and golden frames'
+      costume: 'artistic pink superhero suit with paint-splash patterns, elegant cape like flowing paint, artist beret accessory, creative pink mask with artistic swirls',
+      powers: 'shopping items on display pedestals with magical curator light beams, artistic sparkles',
+      background: 'vibrant pink gradient with paint splashes and golden picture frames floating'
     },
     'collector-cod-planner': {
       title: '🗂️ Wishlist Architect 📋',
@@ -136,7 +156,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Rome wasn\'t built in a day, neither is my cart',
       cardColor: { start: '#ffecd2', end: '#fcb69f' },
-      superheroStyle: 'A meticulous woman in a structured peach and gold superhero suit with architectural line patterns, builder cape with blueprint design and architect insignia, wearing a professional peach mask, shopping items assembling like building blocks with holographic blueprints swirling around, superhero stance constructing tower of organized items, warm peach gradient background with architectural grid lines'
+      costume: 'structured peach and gold superhero suit with architectural line patterns, builder cape with blueprint design, professional peach mask, architect insignia',
+      powers: 'shopping items assembling like building blocks, holographic blueprints swirling',
+      background: 'warm peach gradient with architectural grid lines and golden construction beams'
     },
     'collector-bnpl-zen': {
       title: '☕ Slow Glow Collector 🌸',
@@ -148,7 +170,9 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Good things come to those who browse',
       cardColor: { start: '#ffeaa7', end: '#fdcb6e' },
-      superheroStyle: 'A serene woman in a cozy golden yellow nature-inspired superhero suit with flower petal patterns, flowing garden-themed cape and tea-master sash, wearing a gentle yellow mask with flower crown, nature magic making flowers bloom around shopping items with peaceful golden aura, meditation pose with one hand holding coffee cup and other hand blooming flowers, warm golden gradient background with soft sunbeams and floating petals'
+      costume: 'cozy golden yellow nature-inspired superhero suit with flower petal patterns, flowing garden-themed cape, gentle yellow mask with flower crown accessory',
+      powers: 'nature magic making flowers bloom around shopping items, peaceful golden aura',
+      background: 'warm golden gradient with soft sunbeams, floating flower petals and butterflies'
     }
   };
 
@@ -164,36 +188,134 @@ function generatePersonaLocally(answers) {
     ],
     tagline: 'One of a kind shopper extraordinaire!',
     cardColor: { start: '#667eea', end: '#764ba2' },
-    superheroStyle: 'A magical woman in a rainbow-colored superhero suit with unicorn horn crown, sparkling star cape, wearing a mystical rainbow mask with magical gem, rainbow magic aura with sparkles and shopping bags transformed into magical artifacts, majestic superhero pose with arms spread releasing rainbow magic, vibrant rainbow gradient background with stars and magical swirls'
+    costume: 'magical rainbow-colored superhero suit with unicorn horn crown, sparkling star cape, mystical rainbow mask with magical gem',
+    powers: 'rainbow magic aura with sparkles, shopping bags as magical artifacts',
+    background: 'vibrant rainbow gradient with stars and magical swirls'
   };
 
   return persona;
 }
 
-async function generateSuperheroAvatar(personaData, userPhoto) {
+async function analyzePhotoWithGPT4Vision(photoBase64) {
   try {
-    // Comprehensive superhero prompt
-    const superheroPrompt = `Create a professional 3D character in modern animation style similar to Pixar or Disney movies.
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',  // GPT-4 with vision
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `Analyze this person's facial features in extreme detail for creating a 3D Pixar-style character. Describe:
 
-CHARACTER DESCRIPTION: ${personaData.superheroStyle}
+1. FACE SHAPE: (round, oval, square, heart-shaped, diamond, etc.)
+2. SKIN TONE: (exact color description - fair, tan, brown, dark, etc. with undertones)
+3. EYES: 
+   - Shape (almond, round, hooded, upturned, downturned)
+   - Color (exact shade)
+   - Size (large, medium, small relative to face)
+   - Eyebrow shape and thickness
+4. NOSE:
+   - Shape (button, straight, wide, narrow, pointed, rounded)
+   - Size relative to face
+5. MOUTH & LIPS:
+   - Lip fullness (thin, medium, full)
+   - Mouth width
+   - Natural expression
+6. HAIR:
+   - Color (exact shade)
+   - Style (straight, wavy, curly, length)
+   - Texture
+7. FACIAL STRUCTURE:
+   - Cheekbone prominence
+   - Jawline shape
+   - Chin shape
+8. EXPRESSION:
+   - Natural facial expression
+   - Smile style
+   - Overall vibe (friendly, serious, playful, etc.)
+9. AGE RANGE: (approximate)
+10. DISTINCTIVE FEATURES: (dimples, freckles, facial hair, glasses, etc.)
 
-TECHNICAL SPECIFICATIONS:
-- High-quality 3D CGI rendering with smooth, polished surfaces
-- Professional animation quality like Pixar's The Incredibles
-- Large expressive eyes with detailed reflections
-- Volumetric lighting with dramatic rim lights for depth
-- Rich, vibrant colors with cinematic color grading
-- Subsurface scattering on skin for realistic look
-- Clean, crisp rendering at high resolution
-- Centered portrait composition, character filling 70% of frame
-- Shallow depth of field with bokeh background blur
-- Masterpiece quality studio lighting setup
+Provide a detailed paragraph that captures their exact likeness for 3D character creation.`
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: photoBase64
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 800
+      })
+    });
 
-STYLE: Photo-realistic 3D CGI with stylized proportions, exactly like a character from a Pixar superhero movie. Professional animation studio quality.
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('GPT-4 Vision Error:', errorData);
+      throw new Error(`GPT-4 Vision failed: ${response.status}`);
+    }
 
-IMPORTANT: No text, logos, watermarks, or words anywhere in the image.`;
+    const data = await response.json();
+    const analysis = data.choices[0].message.content;
+    
+    return analysis;
 
-    console.log('Calling OpenAI DALL-E 3...');
+  } catch (error) {
+    console.error('Photo analysis error:', error);
+    // Fallback to generic description if analysis fails
+    return "A person with friendly features, expressive eyes, and a warm smile";
+  }
+}
+
+async function generatePixarSuperheroFromAnalysis(personaData, facialAnalysis) {
+  try {
+    // Craft comprehensive prompt combining facial analysis + superhero costume
+    const pixarPrompt = `Create a professional 3D Pixar-style superhero character portrait in the animation quality of "The Incredibles" movie.
+
+CRITICAL - EXACT FACIAL FEATURES (THIS IS THE MOST IMPORTANT PART):
+${facialAnalysis}
+
+Transform this person into a superhero while KEEPING ALL their facial features, expressions, and likeness EXACTLY as described above.
+
+SUPERHERO COSTUME & STYLING:
+${personaData.costume}
+
+SUPERPOWERS & EFFECTS:
+${personaData.powers}
+
+BACKGROUND:
+${personaData.background}
+
+TECHNICAL SPECIFICATIONS FOR PIXAR QUALITY:
+- Professional 3D CGI rendering with Pixar Animation Studios quality
+- Large, expressive Pixar-style eyes that MATCH the person's actual eye color and shape from the analysis
+- Smooth, polished surfaces with subsurface scattering on skin
+- Skin tone MUST match exactly as described in the facial analysis
+- Volumetric lighting with dramatic superhero rim lights
+- Rich, vibrant superhero colors with cinematic color grading
+- Dynamic superhero pose - confident and powerful
+- Centered composition, character filling 75% of frame
+- Shallow depth of field with background blur
+- Photo-realistic 3D rendering with stylized Pixar proportions
+- Masterpiece quality studio lighting
+- The character should look EXACTLY like the person described, just in Pixar 3D style with superhero costume
+
+STYLE REFERENCE: Exactly like characters from Pixar's "The Incredibles" - same 3D rendering quality, same character design approach, same lighting and materials.
+
+CRITICAL: Keep the person's EXACT facial features, hair color, skin tone, eye color, face shape, and expression as described. Only add the superhero costume and effects. The face should be recognizably the same person, just rendered in beautiful 3D Pixar style.
+
+NO text, logos, or watermarks anywhere in the image.`;
+
+    console.log('Sending prompt to DALL-E 3...');
     
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -203,7 +325,7 @@ IMPORTANT: No text, logos, watermarks, or words anywhere in the image.`;
       },
       body: JSON.stringify({
         model: 'dall-e-3',
-        prompt: superheroPrompt,
+        prompt: pixarPrompt,
         n: 1,
         size: '1024x1024',
         quality: 'hd',
@@ -213,58 +335,20 @@ IMPORTANT: No text, logos, watermarks, or words anywhere in the image.`;
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenAI API Error Response:', errorData);
-      throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      console.error('DALL-E Error:', errorData);
+      throw new Error(`DALL-E failed: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI Response:', JSON.stringify(data, null, 2));
     
-    if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-      throw new Error('No data array in OpenAI response');
-    }
-    
-    if (!data.data[0].url) {
-      throw new Error('No image URL in OpenAI response');
+    if (!data.data || !data.data[0] || !data.data[0].url) {
+      throw new Error('No image URL in response');
     }
 
-    const imageUrl = data.data[0].url;
-    console.log('Successfully generated image:', imageUrl);
-    
-    return imageUrl;
+    return data.data[0].url;
 
   } catch (error) {
-    console.error('DALL-E Generation Error:', error);
-    console.error('Error details:', error.message);
-    
-    // Return a placeholder only if image generation fails
-    throw error; // Re-throw to let the handler catch it
+    console.error('Avatar generation error:', error);
+    throw error;
   }
-}
-
-function getCartTrait(behavior) {
-  const traits = {
-    ghost: 'Professional cart abandoner',
-    decisive: 'Instant decision maker',
-    collector: 'Wishlist curator supreme'
-  };
-  return traits[behavior] || 'Mystery shopper';
-}
-
-function getPaymentTrait(style) {
-  const traits = {
-    prepaid: 'Discount hunter extraordinaire',
-    cod: 'Cash is king believer',
-    bnpl: 'Future-focused spender'
-  };
-  return traits[style] || 'Payment philosopher';
-}
-
-function getSpeedTrait(speed) {
-  const traits = {
-    lightning: 'Lightning speed champion',
-    planner: 'Strategic planning master',
-    zen: 'Zen shopping guru'
-  };
-  return traits[speed] || 'Time traveler';
 }
