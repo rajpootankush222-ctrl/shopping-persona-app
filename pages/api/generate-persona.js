@@ -1,5 +1,5 @@
 // pages/api/generate-persona.js
-// Uses OpenAI DALL-E 3 for avatar generation
+// Optimized for 3D Pixar-style character generation with DALL-E 3
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -9,11 +9,11 @@ export default async function handler(req, res) {
   const { answers, photo } = req.body;
 
   try {
-    // Generate persona using local logic (no Claude API needed)
+    // Generate persona using local logic
     const personaData = generatePersonaLocally(answers);
     
-    // Generate avatar using OpenAI DALL-E
-    const avatarUrl = await generateAvatarWithOpenAI(personaData);
+    // Generate 3D Pixar-style avatar using OpenAI DALL-E
+    const avatarUrl = await generatePixarAvatar(personaData);
     
     return res.status(200).json({
       personaTitle: personaData.title,
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 function generatePersonaLocally(answers) {
   const { cartBehavior, paymentStyle, shoppingSpeed } = answers;
   
-  // Persona mapping logic with avatar descriptions
+  // Enhanced persona mapping with detailed 3D Pixar character descriptions
   const personas = {
     // Cart Ghosts
     'ghost-prepaid-lightning': {
@@ -49,7 +49,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'If it takes longer than 5 mins, it\'s abandoned',
       cardColor: { start: '#667eea', end: '#764ba2' },
-      avatarDescription: 'A playful cartoon character with a mischievous smile, surrounded by fading shopping bags and sparkles, purple and blue color scheme, Disney Pixar 3D animation style, professional studio lighting'
+      pixarDescription: {
+        character: 'A young, energetic woman with expressive eyes and a playful, mischievous smile',
+        clothing: 'wearing a trendy purple hoodie with lightning bolt patterns',
+        props: 'surrounded by floating, semi-transparent shopping bags that are fading away like ghosts',
+        setting: 'purple and electric blue gradient background with sparkles and small lightning bolts',
+        mood: 'playful, energetic, slightly mischievous',
+        pose: 'dynamic pose, one hand reaching out playfully as if about to disappear'
+      }
     },
     'ghost-cod-planner': {
       title: '📋 Calculated Cart Ghost 👻',
@@ -60,7 +67,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I ghost with intention, not impulse',
       cardColor: { start: '#f093fb', end: '#f5576c' },
-      avatarDescription: 'A thoughtful cartoon character holding a planner and checklist, with organized shopping bags floating around, pink and purple gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A thoughtful young woman with glasses and an intelligent, knowing expression',
+        clothing: 'wearing a cozy pink cardigan and holding a small notebook',
+        props: 'floating planner pages and organized shopping lists around her, with some items crossed out',
+        setting: 'soft pink gradient background with geometric patterns',
+        mood: 'calm, strategic, organized',
+        pose: 'sitting cross-legged with a planner, looking satisfied and contemplative'
+      }
     },
     'ghost-bnpl-zen': {
       title: '🧘 Zen Cart Ghost 👻',
@@ -71,7 +85,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Ghosting carts is my meditation',
       cardColor: { start: '#4facfe', end: '#00f2fe' },
-      avatarDescription: 'A calm and peaceful cartoon character meditating with shopping items floating around in a zen-like atmosphere, blue gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A serene woman with peaceful closed eyes and a gentle smile, radiating calmness',
+        clothing: 'wearing a flowing light blue yoga outfit',
+        props: 'in meditation pose with shopping items floating peacefully around her like chakras',
+        setting: 'tranquil blue gradient background with soft clouds and zen circles',
+        mood: 'peaceful, zen-like, completely relaxed',
+        pose: 'lotus meditation position, floating slightly above ground'
+      }
     },
 
     // Decisive Shoppers
@@ -84,7 +105,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I see it, I buy it, I own it',
       cardColor: { start: '#fa709a', end: '#fee140' },
-      avatarDescription: 'An energetic cartoon character in a superhero pose with lightning bolts and shopping bags, dynamic action pose, pink and yellow gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A confident woman with determined eyes and a victorious superhero smile',
+        clothing: 'wearing a vibrant pink and yellow athletic outfit with star patterns',
+        props: 'holding shopping bags like trophies, with lightning bolts and speed lines around her',
+        setting: 'dynamic pink-to-yellow gradient background with comic-style action effects',
+        mood: 'powerful, confident, triumphant',
+        pose: 'superhero landing pose with one fist raised victoriously'
+      }
     },
     'decisive-cod-planner': {
       title: '📊 Strategic Instant Buyer 💼',
@@ -95,7 +123,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Plan fast, buy faster',
       cardColor: { start: '#30cfd0', end: '#330867' },
-      avatarDescription: 'A professional-looking cartoon character with glasses holding a tablet and credit card, surrounded by organized shopping lists, teal and purple gradient, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A professional-looking woman with stylish glasses and a confident, smart expression',
+        clothing: 'wearing a chic teal blazer and holding a tablet showing graphs',
+        props: 'surrounded by holographic shopping data, checkmarks, and organized lists',
+        setting: 'sleek teal-to-purple gradient background with digital elements',
+        mood: 'professional, decisive, intelligent',
+        pose: 'standing confidently with one hand on hip, other holding tablet'
+      }
     },
     'decisive-bnpl-zen': {
       title: '😎 Chill YOLO Spender 🎯',
@@ -106,7 +141,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I decide now, pay whenever',
       cardColor: { start: '#a8edea', end: '#fed6e3' },
-      avatarDescription: 'A cool and confident cartoon character wearing sunglasses, relaxed pose with shopping bags, pastel blue and pink gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A cool, laid-back woman with trendy sunglasses and a carefree smile',
+        clothing: 'wearing a stylish pastel outfit with relaxed fit',
+        props: 'casually holding shopping bags, with floating credit cards and "YOLO" text effects',
+        setting: 'soft pastel gradient background with dreamy, chill vibes',
+        mood: 'relaxed, cool, carefree',
+        pose: 'leaning casually with one hand in pocket, looking effortlessly cool'
+      }
     },
 
     // Collectors/Curators
@@ -119,7 +161,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'My cart is a masterpiece in 5 minutes',
       cardColor: { start: '#ff9a9e', end: '#fecfef' },
-      avatarDescription: 'An artistic cartoon character with a painter\'s beret, surrounded by colorful shopping items arranged like art pieces, pink gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'An artistic woman with a creative sparkle in her eyes and an excited expression',
+        clothing: 'wearing a cute pink beret and a stylish artist smock',
+        props: 'surrounded by shopping items arranged like art pieces on floating pedestals',
+        setting: 'vibrant pink gradient background with artistic paint splashes and frames',
+        mood: 'creative, excited, artistic',
+        pose: 'gesturing enthusiastically toward her curated collection'
+      }
     },
     'collector-cod-planner': {
       title: '🗂️ Wishlist Architect 📋',
@@ -130,7 +179,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Rome wasn\'t built in a day, neither is my cart',
       cardColor: { start: '#ffecd2', end: '#fcb69f' },
-      avatarDescription: 'An organized cartoon character with a clipboard and blueprints, carefully arranging shopping items like building blocks, warm peach gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A meticulous woman with focused eyes and a satisfied smile',
+        clothing: 'wearing a professional peach-colored outfit with organized pockets',
+        props: 'holding blueprints of shopping plans, with items stacked like building blocks',
+        setting: 'warm peach gradient background with architectural grid lines',
+        mood: 'organized, satisfied, methodical',
+        pose: 'reviewing her perfectly organized wishlist with pride'
+      }
     },
     'collector-bnpl-zen': {
       title: '☕ Slow Glow Collector 🌸',
@@ -141,7 +197,14 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Good things come to those who browse',
       cardColor: { start: '#ffeaa7', end: '#fdcb6e' },
-      avatarDescription: 'A serene cartoon character sipping coffee, surrounded by carefully curated shopping items and flowers, warm yellow gradient background, Disney Pixar 3D animation style'
+      pixarDescription: {
+        character: 'A serene woman with gentle eyes and a warm, content smile',
+        clothing: 'wearing a cozy yellow sweater, holding a cup of coffee',
+        props: 'surrounded by carefully selected items and blooming flowers',
+        setting: 'warm golden gradient background with soft sunbeams and petals',
+        mood: 'peaceful, content, unhurried',
+        pose: 'sitting comfortably, sipping coffee while admiring her collection'
+      }
     }
   };
 
@@ -158,16 +221,45 @@ function generatePersonaLocally(answers) {
     ],
     tagline: 'One of a kind shopper extraordinaire!',
     cardColor: { start: '#667eea', end: '#764ba2' },
-    avatarDescription: 'A unique and magical cartoon character with a unicorn horn, surrounded by sparkles and shopping bags, rainbow gradient background, Disney Pixar 3D animation style'
+    pixarDescription: {
+      character: 'A magical woman with sparkling eyes and a joyful, unique expression',
+      clothing: 'wearing a rainbow-colored outfit with unicorn horn accessory',
+      props: 'surrounded by magical sparkles and floating shopping items',
+      setting: 'colorful rainbow gradient background with stars and magic effects',
+      mood: 'magical, joyful, one-of-a-kind',
+      pose: 'twirling happily with shopping bags transformed into magical accessories'
+    }
   };
 
   return persona;
 }
 
-async function generateAvatarWithOpenAI(personaData) {
+async function generatePixarAvatar(personaData) {
   try {
-    // Create the prompt for DALL-E
-    const prompt = `Create a vibrant 3D cartoon avatar in Disney Pixar animation style. ${personaData.avatarDescription}. The character should be cute, expressive, and professional quality with smooth rendering, bright colors, and studio lighting. Square composition, centered character portrait.`;
+    const desc = personaData.pixarDescription;
+    
+    // Craft the perfect 3D Pixar prompt
+    const pixarPrompt = `A high-quality 3D rendered character portrait in the style of Pixar Animation Studios. 
+
+CHARACTER: ${desc.character}
+OUTFIT: ${desc.clothing}
+PROPS & ELEMENTS: ${desc.props}
+BACKGROUND: ${desc.setting}
+EXPRESSION & MOOD: ${desc.mood}
+POSE: ${desc.pose}
+
+STYLE REQUIREMENTS:
+- Professional 3D CGI rendering with Pixar-quality details
+- Smooth, polished surfaces with subsurface scattering on skin
+- Large expressive eyes with detailed reflections and catchlights
+- Soft, volumetric lighting with rim lights for depth
+- Rich, vibrant colors with proper color grading
+- Clean, crisp rendering at high resolution
+- Centered portrait composition, character filling most of frame
+- Shallow depth of field with bokeh background blur
+- No text, logos, or watermarks
+
+TECHNICAL: Rendered as if from a Pixar movie, photo-realistic 3D CGI with cartoon proportions, masterpiece quality, studio lighting setup.`;
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -176,18 +268,19 @@ async function generateAvatarWithOpenAI(personaData) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'dall-e-3',  // Use DALL-E 3 for best quality
-        prompt: prompt,
+        model: 'dall-e-3',
+        prompt: pixarPrompt,
         n: 1,
-        size: '1024x1024',  // Square format, good quality
-        quality: 'standard', // 'standard' or 'hd' (hd costs more)
-        style: 'vivid'       // 'vivid' for more hyper-real, 'natural' for more subtle
+        size: '1024x1024',
+        quality: 'hd',      // Use HD quality for best Pixar results
+        style: 'vivid'      // Vivid for rich, vibrant colors
       })
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      console.error('OpenAI API Error:', errorData);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -196,14 +289,14 @@ async function generateAvatarWithOpenAI(personaData) {
       throw new Error('No image URL in OpenAI response');
     }
 
-    // Return the generated image URL
     return data.data[0].url;
 
   } catch (error) {
-    console.error('OpenAI DALL-E Error:', error);
+    console.error('DALL-E Generation Error:', error);
     
-    // Fallback: Return a placeholder image if generation fails
-    return 'https://via.placeholder.com/1024x1024/E91E63/FFFFFF?text=Avatar';
+    // Fallback: Return a colorful placeholder
+    const color = personaData.cardColor.start.replace('#', '');
+    return `https://via.placeholder.com/1024x1024/${color}/FFFFFF?text=Shopping+Persona`;
   }
 }
 
