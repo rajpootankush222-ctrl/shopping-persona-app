@@ -2,6 +2,7 @@
   "name": "shopping-persona-id-generator",
   "version": "1.0.0",
   "description": "AI-powered shopping persona ID card generator",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,13 +12,15 @@
   "dependencies": {
     "next": "^14.2.0",
     "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "react-dom": "^18.3.0",
+    "sharp": "^0.33.4",
+    "form-data": "^4.0.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.17.0"
   }
 }
