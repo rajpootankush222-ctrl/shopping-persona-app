@@ -1,5 +1,5 @@
 // pages/api/generate-persona.js
-// Optimized for 3D Pixar-style character generation with DALL-E 3
+// Uses user photo for facial features + Shopping Superhero costumes in 3D Pixar style
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,8 +12,8 @@ export default async function handler(req, res) {
     // Generate persona using local logic
     const personaData = generatePersonaLocally(answers);
     
-    // Generate 3D Pixar-style avatar using OpenAI DALL-E
-    const avatarUrl = await generatePixarAvatar(personaData);
+    // Generate 3D Pixar avatar with user's face + superhero costume
+    const avatarUrl = await generateSuperheroAvatar(personaData, photo);
     
     return res.status(200).json({
       personaTitle: personaData.title,
@@ -22,7 +22,8 @@ export default async function handler(req, res) {
       trait3: personaData.traits[2],
       tagline: personaData.tagline,
       cardColor: personaData.cardColor,
-      avatarUrl: avatarUrl
+      avatarUrl: avatarUrl,
+      superheroName: personaData.superheroName
     });
 
   } catch (error) {
@@ -37,11 +38,12 @@ export default async function handler(req, res) {
 function generatePersonaLocally(answers) {
   const { cartBehavior, paymentStyle, shoppingSpeed } = answers;
   
-  // Enhanced persona mapping with detailed 3D Pixar character descriptions
+  // Enhanced persona mapping with Shopping Superhero themes
   const personas = {
-    // Cart Ghosts
+    // Cart Ghosts - Stealth/Phantom Superheroes
     'ghost-prepaid-lightning': {
       title: '⚡ Lightning Cart Ghost 👻',
+      superheroName: 'The Phantom Shopper',
       traits: [
         '🛒 Ghosts carts faster than light',
         '💳 Only pays when feeling generous',
@@ -49,17 +51,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'If it takes longer than 5 mins, it\'s abandoned',
       cardColor: { start: '#667eea', end: '#764ba2' },
-      pixarDescription: {
-        character: 'A young, energetic woman with expressive eyes and a playful, mischievous smile',
-        clothing: 'wearing a trendy purple hoodie with lightning bolt patterns',
-        props: 'surrounded by floating, semi-transparent shopping bags that are fading away like ghosts',
-        setting: 'purple and electric blue gradient background with sparkles and small lightning bolts',
-        mood: 'playful, energetic, slightly mischievous',
-        pose: 'dynamic pose, one hand reaching out playfully as if about to disappear'
+      superheroStyle: {
+        costume: 'sleek purple and electric blue superhero suit with lightning bolt emblem on chest, flowing cape that fades into transparency like a ghost',
+        mask: 'stylish purple domino mask with lightning accents',
+        powers: 'surrounded by purple energy aura with shopping bags vanishing into sparkles',
+        pose: 'dynamic superhero pose with one hand raised creating lightning effects',
+        background: 'purple and blue gradient with lightning bolts and phantom shopping bag silhouettes'
       }
     },
     'ghost-cod-planner': {
       title: '📋 Calculated Cart Ghost 👻',
+      superheroName: 'The Strategist',
       traits: [
         '🛒 Plans to ghost the cart the night before',
         '💳 Cash on Delivery for peace of mind',
@@ -67,17 +69,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I ghost with intention, not impulse',
       cardColor: { start: '#f093fb', end: '#f5576c' },
-      pixarDescription: {
-        character: 'A thoughtful young woman with glasses and an intelligent, knowing expression',
-        clothing: 'wearing a cozy pink cardigan and holding a small notebook',
-        props: 'floating planner pages and organized shopping lists around her, with some items crossed out',
-        setting: 'soft pink gradient background with geometric patterns',
-        mood: 'calm, strategic, organized',
-        pose: 'sitting cross-legged with a planner, looking satisfied and contemplative'
+      superheroStyle: {
+        costume: 'sophisticated pink and purple tactical suit with organized pouches and utility belt, smart-looking shoulder cape',
+        mask: 'intelligent-looking pink mask with integrated HUD display',
+        powers: 'holographic shopping lists and plans floating around, clipboard shield in hand',
+        pose: 'confident superhero stance reviewing holographic battle plans',
+        background: 'pink gradient with geometric pattern overlays and data visualizations'
       }
     },
     'ghost-bnpl-zen': {
       title: '🧘 Zen Cart Ghost 👻',
+      superheroName: 'The Mindful Warrior',
       traits: [
         '🛒 Takes time to ghost the perfect cart',
         '💳 Buy Now, Ghost Later philosophy',
@@ -85,19 +87,19 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Ghosting carts is my meditation',
       cardColor: { start: '#4facfe', end: '#00f2fe' },
-      pixarDescription: {
-        character: 'A serene woman with peaceful closed eyes and a gentle smile, radiating calmness',
-        clothing: 'wearing a flowing light blue yoga outfit',
-        props: 'in meditation pose with shopping items floating peacefully around her like chakras',
-        setting: 'tranquil blue gradient background with soft clouds and zen circles',
-        mood: 'peaceful, zen-like, completely relaxed',
-        pose: 'lotus meditation position, floating slightly above ground'
+      superheroStyle: {
+        costume: 'flowing light blue and cyan martial arts inspired superhero suit with zen circle emblem, meditation-style wrapped sash',
+        mask: 'peaceful blue mask with third eye symbol',
+        powers: 'floating in meditation pose with chi energy swirls and shopping items orbiting peacefully',
+        pose: 'zen meditation pose levitating with inner peace aura',
+        background: 'tranquil blue gradient with floating clouds and zen circles'
       }
     },
 
-    // Decisive Shoppers
+    // Decisive Shoppers - Action Hero Superheroes
     'decisive-prepaid-lightning': {
       title: '🚀 Rocket Checkout Champion ⚡',
+      superheroName: 'Captain Checkout',
       traits: [
         '🛒 Cart to checkout in 3 seconds flat',
         '💳 Prepaid discount hunter supreme',
@@ -105,17 +107,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I see it, I buy it, I own it',
       cardColor: { start: '#fa709a', end: '#fee140' },
-      pixarDescription: {
-        character: 'A confident woman with determined eyes and a victorious superhero smile',
-        clothing: 'wearing a vibrant pink and yellow athletic outfit with star patterns',
-        props: 'holding shopping bags like trophies, with lightning bolts and speed lines around her',
-        setting: 'dynamic pink-to-yellow gradient background with comic-style action effects',
-        mood: 'powerful, confident, triumphant',
-        pose: 'superhero landing pose with one fist raised victoriously'
+      superheroStyle: {
+        costume: 'vibrant pink and yellow armored superhero suit with star emblem, rocket boosters on boots, championship belt',
+        mask: 'aerodynamic pink mask with speed lines design',
+        powers: 'speed force lightning crackling around body, shopping bags transformed into victory trophies',
+        pose: 'explosive superhero landing with fist to ground creating shockwave',
+        background: 'dynamic pink-yellow gradient with speed lines and comic-style "POW" effects'
       }
     },
     'decisive-cod-planner': {
       title: '📊 Strategic Instant Buyer 💼',
+      superheroName: 'Commander Commerce',
       traits: [
         '🛒 Plans purchases, executes instantly',
         '💳 COD for maximum control',
@@ -123,17 +125,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Plan fast, buy faster',
       cardColor: { start: '#30cfd0', end: '#330867' },
-      pixarDescription: {
-        character: 'A professional-looking woman with stylish glasses and a confident, smart expression',
-        clothing: 'wearing a chic teal blazer and holding a tablet showing graphs',
-        props: 'surrounded by holographic shopping data, checkmarks, and organized lists',
-        setting: 'sleek teal-to-purple gradient background with digital elements',
-        mood: 'professional, decisive, intelligent',
-        pose: 'standing confidently with one hand on hip, other holding tablet'
+      superheroStyle: {
+        costume: 'high-tech teal and purple tactical armor with digital display panels, commander insignia, tech-enhanced gloves',
+        mask: 'advanced teal visor mask with targeting system overlay',
+        powers: 'holographic tactical display surrounding, data streams flowing from fingertips',
+        pose: 'commanding superhero stance directing holographic battle plans',
+        background: 'sleek teal-purple gradient with digital grid and command center holograms'
       }
     },
     'decisive-bnpl-zen': {
       title: '😎 Chill YOLO Spender 🎯',
+      superheroName: 'The Cool Crusader',
       traits: [
         '🛒 Decisive when the vibe is right',
         '💳 BNPL because why stress?',
@@ -141,19 +143,19 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'I decide now, pay whenever',
       cardColor: { start: '#a8edea', end: '#fed6e3' },
-      pixarDescription: {
-        character: 'A cool, laid-back woman with trendy sunglasses and a carefree smile',
-        clothing: 'wearing a stylish pastel outfit with relaxed fit',
-        props: 'casually holding shopping bags, with floating credit cards and "YOLO" text effects',
-        setting: 'soft pastel gradient background with dreamy, chill vibes',
-        mood: 'relaxed, cool, carefree',
-        pose: 'leaning casually with one hand in pocket, looking effortlessly cool'
+      superheroStyle: {
+        costume: 'stylish pastel blue and pink casual-cool superhero suit with trendy jacket overlay, relaxed fit with designer touches',
+        mask: 'fashionable mirror sunglasses that double as superhero mask',
+        powers: 'chill aura emanating confidence, credit cards floating like playing cards being shuffled',
+        pose: 'effortlessly cool superhero lean with arms crossed',
+        background: 'soft pastel gradient with dreamy bokeh effects and "YOLO" energy wisps'
       }
     },
 
-    // Collectors/Curators
+    // Collectors/Curators - Mystical/Magical Superheroes
     'collector-prepaid-lightning': {
       title: '🎨 Flash Art Curator ⚡',
+      superheroName: 'The Artisan',
       traits: [
         '🛒 Curates carts like museum exhibits',
         '💳 Hunts discounts like treasure',
@@ -161,17 +163,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'My cart is a masterpiece in 5 minutes',
       cardColor: { start: '#ff9a9e', end: '#fecfef' },
-      pixarDescription: {
-        character: 'An artistic woman with a creative sparkle in her eyes and an excited expression',
-        clothing: 'wearing a cute pink beret and a stylish artist smock',
-        props: 'surrounded by shopping items arranged like art pieces on floating pedestals',
-        setting: 'vibrant pink gradient background with artistic paint splashes and frames',
-        mood: 'creative, excited, artistic',
-        pose: 'gesturing enthusiastically toward her curated collection'
+      superheroStyle: {
+        costume: 'artistic pink superhero suit with paint-splash patterns, elegant cape that looks like flowing paint, artist palette shield',
+        mask: 'creative pink mask with artistic swirl designs, artist beret accessory',
+        powers: 'shopping items floating on display pedestals with magical curator light beams',
+        pose: 'artistic superhero pose presenting curated collection with magical gesture',
+        background: 'vibrant pink gradient with paint splashes and golden frames floating'
       }
     },
     'collector-cod-planner': {
       title: '🗂️ Wishlist Architect 📋',
+      superheroName: 'The Builder',
       traits: [
         '🛒 Each item carefully selected',
         '💳 Cash on Delivery, no risks',
@@ -179,17 +181,17 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Rome wasn\'t built in a day, neither is my cart',
       cardColor: { start: '#ffecd2', end: '#fcb69f' },
-      pixarDescription: {
-        character: 'A meticulous woman with focused eyes and a satisfied smile',
-        clothing: 'wearing a professional peach-colored outfit with organized pockets',
-        props: 'holding blueprints of shopping plans, with items stacked like building blocks',
-        setting: 'warm peach gradient background with architectural grid lines',
-        mood: 'organized, satisfied, methodical',
-        pose: 'reviewing her perfectly organized wishlist with pride'
+      superheroStyle: {
+        costume: 'structured peach and gold superhero suit with architectural line patterns, builder cape with blueprint design, architect insignia',
+        mask: 'professional peach mask with blueprint projection capability',
+        powers: 'shopping items assembling like building blocks, holographic blueprints swirling around',
+        pose: 'superhero stance constructing tower of perfectly organized shopping items',
+        background: 'warm peach gradient with architectural grid lines and golden construction aura'
       }
     },
     'collector-bnpl-zen': {
       title: '☕ Slow Glow Collector 🌸',
+      superheroName: 'The Cultivator',
       traits: [
         '🛒 Curating is a journey, not a race',
         '💳 BNPL for flexible collecting',
@@ -197,13 +199,12 @@ function generatePersonaLocally(answers) {
       ],
       tagline: 'Good things come to those who browse',
       cardColor: { start: '#ffeaa7', end: '#fdcb6e' },
-      pixarDescription: {
-        character: 'A serene woman with gentle eyes and a warm, content smile',
-        clothing: 'wearing a cozy yellow sweater, holding a cup of coffee',
-        props: 'surrounded by carefully selected items and blooming flowers',
-        setting: 'warm golden gradient background with soft sunbeams and petals',
-        mood: 'peaceful, content, unhurried',
-        pose: 'sitting comfortably, sipping coffee while admiring her collection'
+      superheroStyle: {
+        costume: 'cozy golden yellow nature-inspired superhero suit with flower petal patterns, flowing garden-themed cape, tea-master sash',
+        mask: 'gentle yellow mask with flower crown accessory',
+        powers: 'nature magic making flowers bloom around shopping items, peaceful golden aura',
+        pose: 'serene superhero meditation pose with one hand holding coffee cup, other hand blooming flowers',
+        background: 'warm golden gradient with soft sunbeams, floating flower petals and butterflies'
       }
     }
   };
@@ -214,6 +215,7 @@ function generatePersonaLocally(answers) {
   // Get persona or fallback to default
   const persona = personas[personaKey] || {
     title: '🎭 Unique Shopping Unicorn 🦄',
+    superheroName: 'The Legendary One',
     traits: [
       '🛒 ' + getCartTrait(cartBehavior),
       '💳 ' + getPaymentTrait(paymentStyle),
@@ -221,45 +223,62 @@ function generatePersonaLocally(answers) {
     ],
     tagline: 'One of a kind shopper extraordinaire!',
     cardColor: { start: '#667eea', end: '#764ba2' },
-    pixarDescription: {
-      character: 'A magical woman with sparkling eyes and a joyful, unique expression',
-      clothing: 'wearing a rainbow-colored outfit with unicorn horn accessory',
-      props: 'surrounded by magical sparkles and floating shopping items',
-      setting: 'colorful rainbow gradient background with stars and magic effects',
-      mood: 'magical, joyful, one-of-a-kind',
-      pose: 'twirling happily with shopping bags transformed into magical accessories'
+    superheroStyle: {
+      costume: 'magical rainbow-colored superhero suit with unicorn horn crown, sparkling star cape',
+      mask: 'mystical rainbow mask with magical gem',
+      powers: 'rainbow magic aura with sparkles and shopping bags transformed into magical artifacts',
+      pose: 'majestic superhero pose with arms spread releasing rainbow magic',
+      background: 'vibrant rainbow gradient with stars and magical swirls'
     }
   };
 
   return persona;
 }
 
-async function generatePixarAvatar(personaData) {
+async function generateSuperheroAvatar(personaData, userPhoto) {
   try {
-    const desc = personaData.pixarDescription;
+    const style = personaData.superheroStyle;
     
-    // Craft the perfect 3D Pixar prompt
-    const pixarPrompt = `A high-quality 3D rendered character portrait in the style of Pixar Animation Studios. 
+    // Craft detailed prompt that uses user's photo for facial features
+    const superheroPrompt = `Create a professional 3D Pixar-style superhero character portrait. This is "${personaData.superheroName}" - a shopping superhero.
 
-CHARACTER: ${desc.character}
-OUTFIT: ${desc.clothing}
-PROPS & ELEMENTS: ${desc.props}
-BACKGROUND: ${desc.setting}
-EXPRESSION & MOOD: ${desc.mood}
-POSE: ${desc.pose}
+CRITICAL - FACIAL FEATURES: Study the provided reference photo carefully. The character MUST have the SAME facial features, expression, and likeness as the person in the photo. Match their:
+- Face shape and structure
+- Eye shape, size and expression
+- Nose shape
+- Mouth and smile
+- Skin tone
+- Hair color and style (but can be styled heroically)
+- Overall facial expression and personality
 
-STYLE REQUIREMENTS:
-- Professional 3D CGI rendering with Pixar-quality details
-- Smooth, polished surfaces with subsurface scattering on skin
-- Large expressive eyes with detailed reflections and catchlights
-- Soft, volumetric lighting with rim lights for depth
-- Rich, vibrant colors with proper color grading
-- Clean, crisp rendering at high resolution
-- Centered portrait composition, character filling most of frame
-- Shallow depth of field with bokeh background blur
+SUPERHERO COSTUME & STYLING:
+${style.costume}
+
+MASK & ACCESSORIES:
+${style.mask}
+
+SUPERPOWERS & EFFECTS:
+${style.powers}
+
+POSE & ACTION:
+${style.pose}
+
+BACKGROUND & SETTING:
+${style.background}
+
+TECHNICAL REQUIREMENTS:
+- Professional 3D CGI rendering in Pixar Animation Studios quality
+- Large expressive Pixar-style eyes that match the reference photo's eye color and shape
+- Smooth polished surfaces with subsurface scattering on skin
+- Volumetric lighting with dramatic superhero rim lights
+- Rich vibrant superhero colors with cinematic color grading
+- Dynamic composition with character centered as main focus
+- Shallow depth of field with background blur for depth
+- Photo-realistic 3D rendering with cartoon proportions
+- Masterpiece quality studio lighting setup
 - No text, logos, or watermarks
 
-TECHNICAL: Rendered as if from a Pixar movie, photo-realistic 3D CGI with cartoon proportions, masterpiece quality, studio lighting setup.`;
+STYLE: Rendered exactly like a character from a Pixar superhero movie (like The Incredibles), with the same person's face from the reference photo but as a 3D Pixar superhero character.`;
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -269,11 +288,11 @@ TECHNICAL: Rendered as if from a Pixar movie, photo-realistic 3D CGI with cartoo
       },
       body: JSON.stringify({
         model: 'dall-e-3',
-        prompt: pixarPrompt,
+        prompt: superheroPrompt,
         n: 1,
         size: '1024x1024',
-        quality: 'hd',      // Use HD quality for best Pixar results
-        style: 'vivid'      // Vivid for rich, vibrant colors
+        quality: 'hd',
+        style: 'vivid'
       })
     });
 
@@ -296,7 +315,7 @@ TECHNICAL: Rendered as if from a Pixar movie, photo-realistic 3D CGI with cartoo
     
     // Fallback: Return a colorful placeholder
     const color = personaData.cardColor.start.replace('#', '');
-    return `https://via.placeholder.com/1024x1024/${color}/FFFFFF?text=Shopping+Persona`;
+    return `https://via.placeholder.com/1024x1024/${color}/FFFFFF?text=${encodeURIComponent(personaData.superheroName)}`;
   }
 }
 
